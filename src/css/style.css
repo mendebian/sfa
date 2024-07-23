@@ -1,0 +1,148 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+html {
+    display: flex;
+    justify-content: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+    background: #000;
+    color: #fff;
+}
+
+.logo {
+    width: 32px;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+}
+
+.setup {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.leagues {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.league-btn {
+    width: 100%
+}
+
+select {
+    color: #fff;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+    border-radius: 0.2rem;
+    border: none;
+}
+
+.teams {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.team {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.simulate-match {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    margin: 1rem;
+    padding: 1rem 2rem;
+    border-radius: 2rem;
+    border: none;
+}
+
+.match {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.scoreboard {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-around;
+    border-bottom: rgba(255, 255, 255, 0.1) solid 2px;
+}
+
+.summary {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    border-bottom: rgba(255, 255, 255, 0.1) solid 2px;
+    font-size: 8px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: rgba(255, 255, 255, 0.1) solid 2px;
+    font-size: 8px;
+}
+
+.stats-label {
+    text-align: center;
+    list-style: none;
+}
+
+.home-summary {
+    list-style: none;
+    text-align: left;
+}
+
+.away-summary {
+    list-style: none;
+    text-align: right;
+}
+
+.home-stats {
+    list-style: none;
+    text-align: left;
+}
+
+.away-stats {
+    list-style: none;
+    text-align: right;
+}
+
+@media only screen and (min-width: 760px) {
+    body {
+        width: 760px;
+    }
+    
+    .summary {
+        font-size: 12px;
+    }
+    
+    .stats {
+        font-size: 12px;
+    }
+}

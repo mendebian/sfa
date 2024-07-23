@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SFA</title>
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+  <main>
+      <section class="setup">
+          <div class="teams">
+              <div class="team">
+                  <select id="home-league" onchange="getHomeLeague()">
+                    <option value=0>League</option>
+                    <option value=1>Europe</option>
+                    <option value=2>Americas</option>
+                  </select>
+                  <select id="home-team">
+                  </select>
+                  <select id="home-mode" class="modos">
+                    <option value=0>Ultra Defensive</option>
+                    <option value=1>Defensive</option>
+                    <option value=2>Moderate</option>
+                    <option value=3>Offensive</option>
+                    <option value=4>Ultra Offensive</option>
+                </select>
+              </div>
+              <div class="team">
+                  <select id="away-league" onchange="getAwayLeague()">
+                    <option value=0>League</option>
+                    <option value=1>Europe</option>
+                    <option value=2>Americas</option>
+                  </select>
+                  <select id="away-team">
+                  </select>
+                  <select id="away-mode">
+                    <option value=0>Ultra Defensive</option>
+                    <option value=1>Defensive</option>
+                    <option value=2>Moderate</option>
+                    <option value=3>Offensive</option>
+                    <option value=4>Ultra Offensive</option>
+                </select>
+              </div>
+          </div>
+          <div class="buttons">
+              <button class="simulate-match" onclick="simule()">SIMULATE MATCH</button>
+          </div>
+      </section>
+      <section class="match" style="display: none;">
+          <div class="scoreboard">
+              <p class="home-score">home</p>
+              <p class="score">0:0</p>
+              <p class="away-score">away</p>
+          </div>
+          <div class="summary">
+              <ul class="home-summary">
+
+              </ul>
+              <ul class="away-summary">
+
+              </ul>
+          </div>
+          <div class="stats">
+              <ul class="home-stats">
+              </ul>
+              <ul class="stats-label">
+                <li>Attempts</li>
+                <li>On target</li>
+                <li>Possession</li>
+              </ul>
+              <ul class="away-stats">
+              </ul>
+          </div>
+          <div class="results">
+              <ul class="previous-results">
+
+              </ul>
+          </div>
+      </section>
+  </main>
+  <script src="src/js/main.js"></script>
+</body>
+</html>
