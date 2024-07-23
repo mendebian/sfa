@@ -88,8 +88,17 @@ select {
 .scoreboard {
     padding: 0.5rem;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    align-items: center;
     border-bottom: rgba(255, 255, 255, 0.1) solid 2px;
+}
+
+.home-score, .away-score {
+    flex: 1;
+}
+
+.score {
+    flex: 0;
 }
 
 .summary {
@@ -102,7 +111,6 @@ select {
 }
 
 .stats {
-    padding: 0.5rem;
     display: flex;
     justify-content: space-between;
     gap: 1rem;
@@ -110,28 +118,15 @@ select {
     font-size: 8px;
 }
 
+.stats-label, .home-summary, .home-stats, .away-summary, .away-stats {
+    list-style: none;
+}
+
 .stats-label {
     text-align: center;
-    list-style: none;
 }
 
-.home-summary {
-    list-style: none;
-    text-align: left;
-}
-
-.away-summary {
-    list-style: none;
-    text-align: right;
-}
-
-.home-stats {
-    list-style: none;
-    text-align: left;
-}
-
-.away-stats {
-    list-style: none;
+.away-summary, .away-stats, .away-score  {
     text-align: right;
 }
 
