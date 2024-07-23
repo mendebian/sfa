@@ -116,7 +116,7 @@ function simule() {
                         const assister = random(10);
                         const scorer = random(10);
                         const li = document.createElement('li');
-                        li.innerHTML = `<strong>${homeData[scorer].JOGADOR}</strong> (${homeData[assister].JOGADOR}) '${timer}` ;
+                        li.innerHTML = `<strong>${homeData[scorer].JOGADOR}</strong>${assister != scorer ? ` (${homeData[assister].JOGADOR})` : ''} '${timer}`;
                         homeSummary.appendChild(li);
                     }
                     homeOnTarget++;
@@ -133,7 +133,7 @@ function simule() {
                         const assister = random(10);
                         const scorer = random(10);
                         const li = document.createElement('li');
-                        li.innerHTML = `<strong>${awayData[scorer].JOGADOR}</strong> (${awayData[assister].JOGADOR}) '${timer}` ;
+                        li.innerHTML = `<strong>${awayData[scorer].JOGADOR}</strong>${assister != scorer ? ` (${awayData[assister].JOGADOR})` : ''} '${timer}`;
                         awaySummary.appendChild(li);
                     }
                     awayOnTarget++;
