@@ -101,6 +101,7 @@ select {
 }
 
 .stats {
+    padding: 0.5rem;
     display: flex;
     justify-content: space-between;
     gap: 1rem;
