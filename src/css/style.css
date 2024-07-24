@@ -72,9 +72,8 @@ select {
 .simulate-match {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    margin: 1rem;
     padding: 1rem 2rem;
-    border-radius: 2rem;
+    border-radius: 0.2rem;
     border: none;
 }
 
@@ -86,7 +85,6 @@ select {
 
 .scoreboard {
     padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
     border-radius: 100px;
     display: flex;
     justify-content: center;
@@ -104,7 +102,15 @@ select {
 
 .summary, .stats {
     padding: 0.5rem;
-    border-bottom: rgba(255, 255, 255, 0.05) solid 2px;
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    font-size: 12px;
+}
+
+.debug {
+    padding: 0.5rem;
+    color: rgba(255, 255, 255, 0.2);
     display: flex;
     justify-content: space-between;
     gap: 2rem;
@@ -128,11 +134,7 @@ select {
         width: 760px;
     }
     
-    .summary {
-        font-size: 12px;
-    }
-    
-    .stats {
-        font-size: 12px;
+    .summary, .stats, .debug {
+        font-size: 16px;
     }
 }
