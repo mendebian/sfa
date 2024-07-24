@@ -72,9 +72,10 @@ select {
 .simulate-match {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    padding: 1rem 2rem;
+    padding: 0.5rem;
     border-radius: 0.2rem;
     border: none;
+    width: 100%;
 }
 
 .match {
