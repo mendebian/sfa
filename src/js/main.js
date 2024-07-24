@@ -1,5 +1,4 @@
-let homeLeague = [];
-let awayLeague = [];
+let homeLeague = [], awayLeague = [];
 
 async function getSheet(league) {
     try {
@@ -80,6 +79,7 @@ function simule() {
     const awayStats = document.querySelector('.away-stats');
     const homeDebug = document.querySelector('.home-debug');
     const awayDebug = document.querySelector('.away-debug');
+    const previusResults = document.querySelector('.previous-results');
 
     const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"]; 
 
@@ -174,4 +174,3 @@ function simule() {
     homeDebug.innerHTML = `${modes[homeMode]} <strong>${homeLevel}</strong>`;
     awayDebug.innerHTML = `<strong>${awayLevel}</strong> ${modes[awayMode]}`;
 }
-
