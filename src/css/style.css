@@ -101,21 +101,16 @@ select {
     flex: 0;
 }
 
-.summary, .stats {
+.summary, .stats, .debug{
     padding: 0.5rem;
     display: flex;
     justify-content: space-between;
     gap: 2rem;
-    font-size: 12px;
+    font-size: 10px;
 }
 
 .debug {
-    padding: 0.5rem;
     color: rgba(255, 255, 255, 0.2);
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-    font-size: 8px;
 }
 
 .stats-label, .home-summary, .home-stats, .away-summary, .away-stats {
