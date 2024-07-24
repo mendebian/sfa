@@ -78,6 +78,10 @@ function simule() {
     const awaySummary = document.querySelector('.away-summary');
     const homeStats = document.querySelector('.home-stats');
     const awayStats = document.querySelector('.away-stats');
+    const homeDebug = document.querySelector('.home-debug');
+    const awayDebug = document.querySelector('.away-debug');
+
+    const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"]; 
 
     setup.style.display = 'none';
     match.style.display = 'block';
@@ -92,7 +96,7 @@ function simule() {
     const homeAdj = modeAdjustments[homeMode];
     const awayAdj = modeAdjustments[awayMode];
     
-    const homeGoalProb = 15 + homeAdj[0] + awayAdj[1];
+    const homeGoalProb = 18 + homeAdj[0] + awayAdj[1];
     const awayGoalProb = 15 + awayAdj[0] + homeAdj[1];
     
     function random(max) {
@@ -116,7 +120,7 @@ function simule() {
                         const assister = random(10);
                         const scorer = random(10);
                         const li = document.createElement('li');
-                        li.innerHTML = `${timer.toString().padStart(2, '0')}' <strong>${homeData[scorer].JOGADOR}</strong> (${homeData[assister].JOGADOR})` ;
+                        li.innerHTML = `${timer.toString().padStart(2, '0')}' <strong>${homeData[scorer].JOGADOR}</strong>${assister === scorer ? '' : ` (${awayData[assister].JOGADOR})`}`;
                         homeSummary.appendChild(li);
                     }
                     homeOnTarget++;
@@ -133,7 +137,7 @@ function simule() {
                         const assister = random(10);
                         const scorer = random(10);
                         const li = document.createElement('li');
-                        li.innerHTML = `<strong>${awayData[scorer].JOGADOR}</strong> (${awayData[assister].JOGADOR}) ${timer.toString().padStart(2, '0')}'` ;
+                        li.innerHTML = `<strong>${awayData[scorer].JOGADOR}</strong>${assister === scorer ? ' ' : ` (${awayData[assister].JOGADOR}) `}${timer.toString().padStart(2, '0')}'`;
                         awaySummary.appendChild(li);
                     }
                     awayOnTarget++;
@@ -166,4 +170,8 @@ function simule() {
         li.textContent = n;
         awayStats.appendChild(li);
     });
+
+    homeDebug.innerHTML = `${modes[homeMode]} <strong>${homeLevel}</strong>`;
+    awayDebug.innerHTML = `<strong>${awayLevel}</strong> ${modes[awayMode]}`;
 }
+
