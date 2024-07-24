@@ -120,7 +120,7 @@ function simule() {
                         const assister = random(10);
                         const scorer = random(10);
                         const li = document.createElement('li');
-                        li.innerHTML = `${timer.toString().padStart(2, '0')}' <strong>${homeData[scorer].JOGADOR}</strong>${assister === scorer ? '' : ` (${awayData[assister].JOGADOR})`}`;
+                        li.innerHTML = `${timer.toString().padStart(2, '0')}' <strong>${homeData[scorer].JOGADOR}</strong>${assister === scorer ? '' : ` (${homeData[assister].JOGADOR})`}`;
                         homeSummary.appendChild(li);
                     }
                     homeOnTarget++;
