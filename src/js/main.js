@@ -81,17 +81,19 @@ function simule() {
     const awayDebug = document.querySelector('.away-debug');
     const previusResults = document.querySelector('.previous-results');
 
-    const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"]; 
-
+    
     setup.style.display = 'none';
     match.style.display = 'block';
-
+    
     homeDisplay.textContent = selectHome;
     awayDisplay.textContent = selectAway;
-
-    let homeScore = 0, awayScore = 0, homeAttempts = 0, awayAttempts = 0, homeOnTarget = 0, awayOnTarget = 0, homePossession = 0, awayPossession = 0;
     
+    let homeScore = 0, awayScore = 0, homeAttempts = 0, awayAttempts = 0, homeOnTarget = 0, awayOnTarget = 0, homePossession = 0, awayPossession = 0;
+    let results = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")) : [];
+
     const modeAdjustments = [[-3, -9], [-2, -7], [3, -3], [7, 2], [9, 3]];
+    
+    const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"]; 
 
     const homeAdj = modeAdjustments[homeMode];
     const awayAdj = modeAdjustments[awayMode];
@@ -173,4 +175,18 @@ function simule() {
 
     homeDebug.innerHTML = `${modes[homeMode]} <strong>${homeLevel}</strong>`;
     awayDebug.innerHTML = `<strong>${awayLevel}</strong> ${modes[awayMode]}`;
+
+    results.forEach(n => {
+        const li = document.createElement('li');
+        li.textContent = n;
+        previusResults.appendChild(li);
+    });
+
+    results.unshift(`${selectHome} ${homeScore}:${awayScore} ${selectAway}`);
+
+    if (results.length > 3) {
+        results.splice(3, 1);
+    }
+
+    localStorage.setItem("results", JSON.stringify(results));
 }
