@@ -113,6 +113,11 @@ select {
     color: rgba(255, 255, 255, 0.2);
 }
 
+.previous-results {
+    list-style-type: none;
+    text-align: center;
+}
+
 .stats-label, .home-summary, .home-stats, .away-summary, .away-stats {
     list-style: none;
 }
