@@ -92,7 +92,8 @@ select {
     align-items: center;
 }
 
-.home-score, .away-score {
+.home-score,
+.away-score {
     flex: 1;
     text-align: center;
 }
@@ -101,7 +102,12 @@ select {
     flex: 0;
 }
 
-.summary, .stats, .debug{
+.summary,
+.stats,
+.lineups,
+.home-formation,
+.away-formation,
+.debug {
     padding: 0.5rem;
     display: flex;
     justify-content: space-between;
@@ -118,24 +124,44 @@ select {
     text-align: center;
 }
 
-.stats-label, .home-summary, .home-stats, .away-summary, .away-stats {
+.stats-label,
+.home-summary,
+.home-stats,
+.away-summary,
+.away-stats,
+.home-lineup,
+.away-lineup,
+.home-ratings,
+.away-ratings {
     list-style: none;
 }
 
-.stats-label, .home-stats, .away-stats {
+.stats-label,
+.home-stats,
+.away-stats,
+.home-ratings,
+.away-ratings {
     text-align: center;
 }
 
-.away-summary {
+.away-summary,
+.away-lineup {
     text-align: right;
+}
+
+.lineups {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
 }
 
 @media only screen and (min-width: 760px) {
     body {
         width: 760px;
     }
-    
-    .summary, .stats, .debug {
+
+    .summary,
+    .stats,
+    .debug {
         font-size: 16px;
     }
 }
