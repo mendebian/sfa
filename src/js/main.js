@@ -1,4 +1,5 @@
-let homeLeague = [], awayLeague = [];
+let homeLeague = [],
+    awayLeague = [];
 
 async function getSheet(league) {
     try {
@@ -55,18 +56,9 @@ function dropdown(id, data) {
 }
 
 function simule() {
+    const setup = document.querySelector('.setup');
     const selectHome = document.getElementById('home-team').value;
     const selectAway = document.getElementById('away-team').value;
-
-    const homeData = homeLeague.filter(player => player.EQUIPE === selectHome && player.STATUS === 'TITULAR');
-    const awayData = awayLeague.filter(player => player.EQUIPE === selectAway && player.STATUS === 'TITULAR');
-    
-    const homeLevel = homeData.reduce((total, player) => total + parseInt(player.NVL), 0);
-    const awayLevel = awayData.reduce((total, player) => total + parseInt(player.NVL), 0);
-
-    const cap = homeLevel + awayLevel;
-
-    const setup = document.querySelector('.setup');
     const match = document.querySelector('.match');
     const homeDisplay = document.querySelector('.home-score');
     const awayDisplay = document.querySelector('.away-score');
@@ -77,30 +69,51 @@ function simule() {
     const awaySummary = document.querySelector('.away-summary');
     const homeStats = document.querySelector('.home-stats');
     const awayStats = document.querySelector('.away-stats');
+    const homeLineUp = document.querySelector('.home-lineup');
+    const awayLineUp = document.querySelector('.away-lineup');
+    const homeRatings = document.querySelector('.home-ratings');
+    const awayRatings = document.querySelector('.away-ratings');
     const homeDebug = document.querySelector('.home-debug');
     const awayDebug = document.querySelector('.away-debug');
     const previusResults = document.querySelector('.previous-results');
 
-    
+    let homeData = homeLeague.filter(player => player.EQUIPE === selectHome && player.STATUS === 'TITULAR');
+    let awayData = awayLeague.filter(player => player.EQUIPE === selectAway && player.STATUS === 'TITULAR');
+
+    homeData = homeData.map(player => ({ ...player, NOTA: 65 + random(10) }));
+    awayData = awayData.map(player => ({ ...player, NOTA: 65 + random(10) }));
+
+    const homeLevel = homeData.reduce((total, player) => total + parseInt(player.NVL), 0);
+    const awayLevel = awayData.reduce((total, player) => total + parseInt(player.NVL), 0);
+
+    const cap = homeLevel + awayLevel;
+
     setup.style.display = 'none';
     match.style.display = 'block';
-    
+
     homeDisplay.textContent = selectHome;
     awayDisplay.textContent = selectAway;
-    
-    let homeScore = 0, awayScore = 0, homeAttempts = 0, awayAttempts = 0, homeOnTarget = 0, awayOnTarget = 0, homePossession = 0, awayPossession = 0;
+
+    let homeScore = 0,
+        awayScore = 0,
+        homeAttempts = 0,
+        awayAttempts = 0,
+        homeOnTarget = 0,
+        awayOnTarget = 0,
+        homePossession = 0,
+        awayPossession = 0;
     let results = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")) : [];
 
     const modeAdjustments = [[-3, -9], [-2, -7], [3, -3], [7, 2], [9, 3]];
-    
-    const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"]; 
+
+    const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"];
 
     const homeAdj = modeAdjustments[homeMode];
     const awayAdj = modeAdjustments[awayMode];
-    
+
     const homeGoalProb = 18 + homeAdj[0] + awayAdj[1];
     const awayGoalProb = 15 + awayAdj[0] + homeAdj[1];
-    
+
     function random(max) {
         let randomArray = new Uint32Array(1);
         window.crypto.getRandomValues(randomArray);
@@ -121,13 +134,43 @@ function simule() {
 
                         const assister = random(10);
                         const scorer = random(10);
+
+                        homeData[scorer].NOTA += 7;
+                        homeData[assister].NOTA += 3;
+
+                        awayData[0].NOTA -= 6;
+
+                        for (let i = 0; i < 5; i++) {
+                            homeData[6 + i].NOTA += 1;
+                            awayData[1 + i].NOTA -= 1;
+                        }
+
                         const li = document.createElement('li');
                         li.innerHTML = `${timer.toString().padStart(2, '0')}' <strong>${homeData[scorer].JOGADOR}</strong>${assister === scorer ? '' : ` (${homeData[assister].JOGADOR})`}`;
                         homeSummary.appendChild(li);
+                    } else {
+                        awayData[0].NOTA += 5;
+
+                        for (let i = 0; i < 5; i++) {
+                            homeData[6 + i].NOTA -= 1;
+                        }
                     }
                     homeOnTarget++;
+                } else {
+                    for (let i = 0; i < 5; i++) {
+                        awayData[1 + i].NOTA += 1;
+                    }
                 }
-                homeAttempts++
+                homeAttempts++;
+
+                for (let i = 0; i < 5; i++) {
+                    homeData[6 + i].NOTA += 1;
+                    awayData[1 + i].NOTA -= 1;
+                }
+            } else {
+                for (let i = 0; i < 5; i++) {
+                    awayData[1 + i].NOTA += 2;
+                }
             }
         } else {
             awayPossession++;
@@ -138,18 +181,74 @@ function simule() {
 
                         const assister = random(10);
                         const scorer = random(10);
+
+                        awayData[scorer].NOTA += 7;
+                        awayData[assister].NOTA += 3;
+
+                        homeData[0].NOTA -= 6;
+
+                        for (let i = 0; i < 5; i++) {
+                            awayData[6 + i].NOTA += 1;
+                            homeData[1 + i].NOTA -= 1;
+                        }
+
                         const li = document.createElement('li');
                         li.innerHTML = `<strong>${awayData[scorer].JOGADOR}</strong>${assister === scorer ? ' ' : ` (${awayData[assister].JOGADOR}) `}${timer.toString().padStart(2, '0')}'`;
                         awaySummary.appendChild(li);
+                    } else {
+                        homeData[0].NOTA += 5;
+
+                        for (let i = 0; i < 5; i++) {
+                            awayData[6 + i].NOTA -= 1;
+                        }
                     }
                     awayOnTarget++;
+                } else {
+                    for (let i = 0; i < 5; i++) {
+                        homeData[1 + i].NOTA += 1;
+                    }
                 }
                 awayAttempts++;
+
+                for (let i = 0; i < 5; i++) {
+                    awayData[6 + i].NOTA += 1;
+                    homeData[1 + i].NOTA -= 1;
+                }
+            } else {
+                for (let i = 0; i < 5; i++) {
+                    homeData[1 + i].NOTA += 2;
+                }
             }
         }
     }
 
     score.innerHTML = `<strong>${homeScore}</strong>:<strong>${awayScore}</strong>`;
+
+    homeData.forEach(n => {
+        const li = document.createElement('li');
+        li.textContent = n.JOGADOR;
+        homeLineUp.appendChild(li);
+    });
+
+    homeData.forEach(n => {
+        const li = document.createElement('li');
+        const nota = n.NOTA > 100 ? 10 : n.NOTA < 0 ? 0 : n.NOTA / 10;
+        li.textContent = nota.toFixed(1);
+        homeRatings.appendChild(li);
+    });
+
+    awayData.forEach(n => {
+        const li = document.createElement('li');
+        li.textContent = n.JOGADOR;
+        awayLineUp.appendChild(li);
+    });
+
+    awayData.forEach(n => {
+        const li = document.createElement('li');
+        const nota = n.NOTA > 100 ? 10 : n.NOTA < 0 ? 0 : n.NOTA / 10;
+        li.textContent = nota.toFixed(1);
+        awayRatings.appendChild(li);
+    });
 
     const stats = [[
         homeAttempts,
@@ -189,4 +288,4 @@ function simule() {
     }
 
     localStorage.setItem("results", JSON.stringify(results));
-}
+                     }
