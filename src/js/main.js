@@ -5,7 +5,6 @@ async function getSheet(league) {
     try {
         const response = await fetch(`https://opensheet.elk.sh/1d6PHvD5VGq1mlxbr7_Nwab9WNngXj-sFaN4btjIRqMo/${league}`);
         const data = await response.json();
-
         return data;
     } catch (err) {
         console.error(err);
@@ -17,7 +16,6 @@ async function getHomeLeague() {
     const league = document.getElementById('home-league').value;
     try {
         const data = await getSheet(league);
-
         dropdown('home-team', data);
         homeLeague = data;
     } catch (err) {
@@ -29,7 +27,6 @@ async function getAwayLeague() {
     const league = document.getElementById('away-league').value;
     try {
         const data = await getSheet(league);
-
         dropdown('away-team', data);
         awayLeague = data;
     } catch (err) {
@@ -48,7 +45,6 @@ function dropdown(id, data) {
 
     teamsSet.forEach(team => {
         const option = document.createElement('option');
-
         option.value = team;
         option.textContent = team;
         select.appendChild(option);
@@ -105,14 +101,24 @@ function simule() {
     let results = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")) : [];
 
     const modeAdjustments = [[-3, -9], [-2, -7], [3, -3], [7, 2], [9, 3]];
-
     const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"];
 
     const homeAdj = modeAdjustments[homeMode];
     const awayAdj = modeAdjustments[awayMode];
 
-    const homeGoalProb = 18 + homeAdj[0] + awayAdj[1];
-    const awayGoalProb = 15 + awayAdj[0] + homeAdj[1];
+    // Ajuste das probabilidades de gol com base no nível das equipes
+    const baseHomeGoalProb = 18; // Probabilidade base para o time da casa
+    const baseAwayGoalProb = 15; // Probabilidade base para o time visitante
+
+    const levelDifference = homeLevel - awayLevel;
+    const homeGoalProb = baseHomeGoalProb + (levelDifference * 0.5); // Ajuste proporcional
+    const awayGoalProb = baseAwayGoalProb - (levelDifference * 0.5); // Ajuste proporcional
+
+    const normalizedHomeGoalProb = Math.max(5, Math.min(35, homeGoalProb)); // Limita entre 5% e 35%
+    const normalizedAwayGoalProb = Math.max(5, Math.min(35, awayGoalProb)); // Limita entre 5% e 35%
+
+    const finalHomeGoalProb = normalizedHomeGoalProb + homeAdj[0] + awayAdj[1];
+    const finalAwayGoalProb = normalizedAwayGoalProb + awayAdj[0] + homeAdj[1];
 
     function random(max) {
         let randomArray = new Uint32Array(1);
@@ -129,9 +135,8 @@ function simule() {
             homePossession++;
             if (attempt <= 80) {
                 if (attempt <= 40) {
-                    if (attempt <= homeGoalProb) {
+                    if (attempt <= finalHomeGoalProb) {
                         homeScore++;
-
                         const assister = random(10);
                         const scorer = random(10);
 
@@ -176,9 +181,8 @@ function simule() {
             awayPossession++;
             if (attempt <= 80) {
                 if (attempt <= 40) {
-                    if (attempt <= awayGoalProb) {
+                    if (attempt <= finalAwayGoalProb) {
                         awayScore++;
-
                         const assister = random(10);
                         const scorer = random(10);
 
@@ -288,4 +292,4 @@ function simule() {
     }
 
     localStorage.setItem("results", JSON.stringify(results));
-                     }
+}
