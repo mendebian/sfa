@@ -51,16 +51,13 @@ function dropdown(id, data) {
     });
 }
 
+// Função principal de simulação
 function simule() {
     const setup = document.querySelector('.setup');
-    const selectHome = document.getElementById('home-team').value;
-    const selectAway = document.getElementById('away-team').value;
     const match = document.querySelector('.match');
     const homeDisplay = document.querySelector('.home-score');
     const awayDisplay = document.querySelector('.away-score');
     const score = document.querySelector('.score');
-    const homeMode = parseInt(document.getElementById('home-mode').value);
-    const awayMode = parseInt(document.getElementById('away-mode').value);
     const homeSummary = document.querySelector('.home-summary');
     const awaySummary = document.querySelector('.away-summary');
     const homeStats = document.querySelector('.home-stats');
@@ -73,195 +70,173 @@ function simule() {
     const awayDebug = document.querySelector('.away-debug');
     const previusResults = document.querySelector('.previous-results');
 
-    let homeData = homeLeague.filter(player => player.EQUIPE === selectHome && player.STATUS === 'TITULAR');
-    let awayData = awayLeague.filter(player => player.EQUIPE === selectAway && player.STATUS === 'TITULAR');
+    const homeMode = parseInt(document.getElementById('home-mode').value);
+    const awayMode = parseInt(document.getElementById('away-mode').value);
+    const selectHome = document.getElementById('home-team').value;
+    const selectAway = document.getElementById('away-team').value;
 
-    homeData = homeData.map(player => ({ ...player, NOTA: 65 + random(10) }));
-    awayData = awayData.map(player => ({ ...player, NOTA: 65 + random(10) }));
+    let homeData = getTeamData(selectHome, homeLeague);
+    let awayData = getTeamData(selectAway, awayLeague);
 
-    const homeLevel = homeData.reduce((total, player) => total + parseInt(player.NVL), 0);
-    const awayLevel = awayData.reduce((total, player) => total + parseInt(player.NVL), 0);
+    const homeLevel = calculateTeamLevel(homeData);
+    const awayLevel = calculateTeamLevel(awayData);
 
     const cap = homeLevel + awayLevel;
 
+    // Esconde o setup e exibe a partida
     setup.style.display = 'none';
     match.style.display = 'block';
 
     homeDisplay.textContent = selectHome;
     awayDisplay.textContent = selectAway;
 
-    let homeScore = 0,
-        awayScore = 0,
-        homeAttempts = 0,
-        awayAttempts = 0,
-        homeOnTarget = 0,
-        awayOnTarget = 0,
-        homePossession = 0,
-        awayPossession = 0;
-    let results = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")) : [];
+    let results = getPreviousResults();
 
-    const modeAdjustments = [[-3, -9], [-2, -7], [3, -3], [7, 2], [9, 3]];
-    const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"];
+    const modeAdjustments = getModeAdjustments(homeMode, awayMode);
+    const goalProbs = calculateGoalProbabilities(homeLevel, awayLevel, modeAdjustments);
 
-    const homeAdj = modeAdjustments[homeMode];
-    const awayAdj = modeAdjustments[awayMode];
+    // Simula as ações de jogo
+    let { homeScore, awayScore, homeAttempts, awayAttempts, homeOnTarget, awayOnTarget, homePossession, awayPossession } = simulateMatch(
+        cap, homeData, awayData, goalProbs, homeSummary, awaySummary
+    );
 
-    // Ajuste das probabilidades de gol com base no nível das equipes
-    const baseHomeGoalProb = 18; // Probabilidade base para o time da casa
-    const baseAwayGoalProb = 15; // Probabilidade base para o time visitante
+    updateMatchStats(homeScore, awayScore, homeAttempts, awayAttempts, homeOnTarget, awayOnTarget, homePossession, awayPossession, score, homeStats, awayStats);
+    updateLineUps(homeData, awayData, homeLineUp, awayLineUp);
+    updateRatings(homeData, awayData, homeRatings, awayRatings);
+    updateDebugInfo(homeLevel, awayLevel, homeMode, awayMode, homeDebug, awayDebug);
 
+    storePreviousResults(selectHome, selectAway, homeScore, awayScore, homeMode, awayMode, results, previusResults);
+}
+
+// Funções auxiliares para refatoração
+
+// Retorna os dados do time com o status "TITULAR"
+function getTeamData(team, league) {
+    return league.filter(player => player.EQUIPE === team && player.STATUS === 'TITULAR')
+                 .map(player => ({ ...player, NOTA: 65 + random(10) }));
+}
+
+// Calcula o nível total do time
+function calculateTeamLevel(data) {
+    return data.reduce((total, player) => total + parseInt(player.NVL), 0);
+}
+
+// Calcula as probabilidades de gol com base no nível de cada time
+function calculateGoalProbabilities(homeLevel, awayLevel, modeAdjustments) {
+    const baseHomeGoalProb = 18;
+    const baseAwayGoalProb = 15;
     const levelDifference = homeLevel - awayLevel;
-    const homeGoalProb = baseHomeGoalProb + (levelDifference * 0.5); // Ajuste proporcional
-    const awayGoalProb = baseAwayGoalProb - (levelDifference * 0.5); // Ajuste proporcional
 
-    const normalizedHomeGoalProb = Math.max(5, Math.min(35, homeGoalProb)); // Limita entre 5% e 35%
-    const normalizedAwayGoalProb = Math.max(5, Math.min(35, awayGoalProb)); // Limita entre 5% e 35%
+    const homeGoalProb = baseHomeGoalProb + (levelDifference * 0.5);
+    const awayGoalProb = baseAwayGoalProb - (levelDifference * 0.5);
 
-    const finalHomeGoalProb = normalizedHomeGoalProb + homeAdj[0] + awayAdj[1];
-    const finalAwayGoalProb = normalizedAwayGoalProb + awayAdj[0] + homeAdj[1];
+    const normalizedHomeGoalProb = Math.max(5, Math.min(35, homeGoalProb));
+    const normalizedAwayGoalProb = Math.max(5, Math.min(35, awayGoalProb));
 
-    function random(max) {
-        let randomArray = new Uint32Array(1);
-        window.crypto.getRandomValues(randomArray);
-        return randomArray[0] % max + 1;
-    }
+    const finalHomeGoalProb = normalizedHomeGoalProb + modeAdjustments.homeAdj[0] + modeAdjustments.awayAdj[1];
+    const finalAwayGoalProb = normalizedAwayGoalProb + modeAdjustments.awayAdj[0] + modeAdjustments.homeAdj[1];
+
+    return { finalHomeGoalProb, finalAwayGoalProb };
+}
+
+// Calcula os ajustes de modo
+function getModeAdjustments(homeMode, awayMode) {
+    const modeAdjustments = [[-3, -9], [-2, -7], [3, -3], [7, 2], [9, 3]];
+    return {
+        homeAdj: modeAdjustments[homeMode],
+        awayAdj: modeAdjustments[awayMode]
+    };
+}
+
+// Simula o jogo, incluindo tentativas de gols e mudanças nos jogadores
+function simulateMatch(cap, homeData, awayData, goalProbs, homeSummary, awaySummary) {
+    let homeScore = 0, awayScore = 0;
+    let homeAttempts = 0, awayAttempts = 0;
+    let homeOnTarget = 0, awayOnTarget = 0;
+    let homePossession = 0, awayPossession = 0;
 
     for (let i = 0; i < 19; i++) {
         const action = random(cap);
         const attempt = random(100);
         const timer = (i * 5) + Math.floor(Math.random() * 6) + 1;
 
-        if (action < homeLevel) {
+        if (action < homeData.reduce((acc, player) => acc + parseInt(player.NVL), 0)) {
             homePossession++;
             if (attempt <= 80) {
                 if (attempt <= 40) {
-                    if (attempt <= finalHomeGoalProb) {
+                    if (attempt <= goalProbs.finalHomeGoalProb) {
                         homeScore++;
-                        const assister = random(10);
-                        const scorer = random(10);
-
-                        homeData[scorer].NOTA += 7;
-                        homeData[assister].NOTA += 3;
-
-                        awayData[0].NOTA -= 6;
-
-                        for (let i = 0; i < 5; i++) {
-                            homeData[6 + i].NOTA += 1;
-                            awayData[1 + i].NOTA -= 1;
-                        }
-
-                        const li = document.createElement('li');
-                        li.innerHTML = `${timer.toString().padStart(2, '0')}' <strong>${homeData[scorer].JOGADOR}</strong>${assister === scorer ? '' : ` (${homeData[assister].JOGADOR})`}`;
-                        homeSummary.appendChild(li);
+                        processGoal(homeData, awayData, homeSummary, attempt, timer);
                     } else {
-                        awayData[0].NOTA += 5;
-
-                        for (let i = 0; i < 5; i++) {
-                            homeData[6 + i].NOTA -= 1;
-                        }
+                        processMiss(homeData, awayData);
                     }
                     homeOnTarget++;
                 } else {
-                    for (let i = 0; i < 5; i++) {
-                        awayData[1 + i].NOTA += 1;
-                    }
+                    processPass(homeData, awayData);
                 }
                 homeAttempts++;
-
-                for (let i = 0; i < 5; i++) {
-                    homeData[6 + i].NOTA += 1;
-                    awayData[1 + i].NOTA -= 1;
-                }
             } else {
-                for (let i = 0; i < 5; i++) {
-                    awayData[1 + i].NOTA += 2;
-                }
+                processMiss(homeData, awayData);
             }
         } else {
             awayPossession++;
             if (attempt <= 80) {
                 if (attempt <= 40) {
-                    if (attempt <= finalAwayGoalProb) {
+                    if (attempt <= goalProbs.finalAwayGoalProb) {
                         awayScore++;
-                        const assister = random(10);
-                        const scorer = random(10);
-
-                        awayData[scorer].NOTA += 7;
-                        awayData[assister].NOTA += 3;
-
-                        homeData[0].NOTA -= 6;
-
-                        for (let i = 0; i < 5; i++) {
-                            awayData[6 + i].NOTA += 1;
-                            homeData[1 + i].NOTA -= 1;
-                        }
-
-                        const li = document.createElement('li');
-                        li.innerHTML = `<strong>${awayData[scorer].JOGADOR}</strong>${assister === scorer ? ' ' : ` (${awayData[assister].JOGADOR}) `}${timer.toString().padStart(2, '0')}'`;
-                        awaySummary.appendChild(li);
+                        processGoal(awayData, homeData, awaySummary, attempt, timer);
                     } else {
-                        homeData[0].NOTA += 5;
-
-                        for (let i = 0; i < 5; i++) {
-                            awayData[6 + i].NOTA -= 1;
-                        }
+                        processMiss(awayData, homeData);
                     }
                     awayOnTarget++;
                 } else {
-                    for (let i = 0; i < 5; i++) {
-                        homeData[1 + i].NOTA += 1;
-                    }
+                    processPass(awayData, homeData);
                 }
                 awayAttempts++;
-
-                for (let i = 0; i < 5; i++) {
-                    awayData[6 + i].NOTA += 1;
-                    homeData[1 + i].NOTA -= 1;
-                }
             } else {
-                for (let i = 0; i < 5; i++) {
-                    homeData[1 + i].NOTA += 2;
-                }
+                processMiss(awayData, homeData);
             }
         }
     }
 
+    return { homeScore, awayScore, homeAttempts, awayAttempts, homeOnTarget, awayOnTarget, homePossession, awayPossession };
+}
+
+// Processa um gol
+function processGoal(scoringTeam, concedingTeam, summary, attempt, timer) {
+    const assister = random(10);
+    const scorer = random(10);
+    scoringTeam[scorer].NOTA += 7;
+    scoringTeam[assister].NOTA += 3;
+    concedingTeam[0].NOTA -= 6;
+
+    const li = document.createElement('li');
+    li.innerHTML = `${timer.toString().padStart(2, '0')}' <strong>${scoringTeam[scorer].JOGADOR}</strong>${assister === scorer ? '' : ` (${scoringTeam[assister].JOGADOR})`}`;
+    summary.appendChild(li);
+}
+
+// Processa um erro de gol
+function processMiss(teamA, teamB) {
+    for (let i = 0; i < 5; i++) {
+        teamA[6 + i].NOTA -= 1;
+    }
+}
+
+// Processa um passe
+function processPass(teamA, teamB) {
+    for (let i = 0; i < 5; i++) {
+        teamB[1 + i].NOTA += 1;
+    }
+}
+
+// Atualiza as estatísticas da partida
+function updateMatchStats(homeScore, awayScore, homeAttempts, awayAttempts, homeOnTarget, awayOnTarget, homePossession, awayPossession, score, homeStats, awayStats) {
     score.innerHTML = `<strong>${homeScore}</strong>:<strong>${awayScore}</strong>`;
 
-    homeData.forEach(n => {
-        const li = document.createElement('li');
-        li.textContent = n.JOGADOR;
-        homeLineUp.appendChild(li);
-    });
-
-    homeData.forEach(n => {
-        const li = document.createElement('li');
-        const nota = n.NOTA > 100 ? 10 : n.NOTA < 0 ? 0 : n.NOTA / 10;
-        li.textContent = nota.toFixed(1);
-        homeRatings.appendChild(li);
-    });
-
-    awayData.forEach(n => {
-        const li = document.createElement('li');
-        li.textContent = n.JOGADOR;
-        awayLineUp.appendChild(li);
-    });
-
-    awayData.forEach(n => {
-        const li = document.createElement('li');
-        const nota = n.NOTA > 100 ? 10 : n.NOTA < 0 ? 0 : n.NOTA / 10;
-        li.textContent = nota.toFixed(1);
-        awayRatings.appendChild(li);
-    });
-
     const stats = [[
-        homeAttempts,
-        homeOnTarget,
-        Math.round((homePossession / 19) * 100) + "%"
+        homeAttempts, homeOnTarget, Math.round((homePossession / 19) * 100) + "%"
     ], [
-        awayAttempts,
-        awayOnTarget,
-        Math.round((awayPossession / 19) * 100) + "%"
+        awayAttempts, awayOnTarget, Math.round((awayPossession / 19) * 100) + "%"
     ]];
 
     stats[0].forEach(n => {
@@ -275,21 +250,97 @@ function simule() {
         li.textContent = n;
         awayStats.appendChild(li);
     });
+}
 
-    homeDebug.innerHTML = `${modes[homeMode]} <strong>${homeLevel}</strong>`;
-    awayDebug.innerHTML = `<strong>${awayLevel}</strong> ${modes[awayMode]}`;
-
-    results.forEach(n => {
+// Atualiza as escalações
+function updateLineUps(homeData, awayData, homeLineUp, awayLineUp) {
+    homeData.forEach(n => {
         const li = document.createElement('li');
-        li.textContent = n;
-        previusResults.appendChild(li);
+        li.textContent = n.JOGADOR;
+        homeLineUp.appendChild(li);
     });
 
-    results.unshift(`${selectHome} ${homeScore}:${awayScore} ${selectAway}`);
+    awayData.forEach(n => {
+        const li = document.createElement('li');
+        li.textContent = n.JOGADOR;
+        awayLineUp.appendChild(li);
+    });
+}
 
-    if (results.length > 3) {
-        results.splice(3, 1);
+// Atualiza as notas dos jogadores
+function updateRatings(homeData, awayData, homeRatings, awayRatings) {
+    homeData.forEach(n => {
+        const li = document.createElement('li');
+        const nota = n.NOTA > 100 ? 10 : n.NOTA < 0 ? 0 : n.NOTA / 10;
+        li.textContent = nota.toFixed(1);
+        homeRatings.appendChild(li);
+    });
+
+    awayData.forEach(n => {
+        const li = document.createElement('li');
+        const nota = n.NOTA > 100 ? 10 : n.NOTA < 0 ? 0 : n.NOTA / 10;
+        li.textContent = nota.toFixed(1);
+        awayRatings.appendChild(li);
+    });
+}
+
+// Atualiza as informações de debug
+function updateDebugInfo(homeLevel, awayLevel, homeMode, awayMode, homeDebug, awayDebug) {
+    const modes = ["UDE", "DEF", "MOD", "OFF", "UOF"];
+    homeDebug.innerHTML = `${modes[homeMode]} <strong>${homeLevel}</strong>`;
+    awayDebug.innerHTML = `<strong>${awayLevel}</strong> ${modes[awayMode]}`;
+}
+
+// Recupera os resultados anteriores
+function getPreviousResults() {
+    return localStorage.getItem("previous_results") ? JSON.parse(localStorage.getItem("previous_results")) : [];
+}
+
+// Armazena os resultados anteriores
+function storePreviousResults(selectHome, selectAway, homeScore, awayScore, homeMode, awayMode, results, previusResults) {
+    results.unshift({
+        home: {
+            team: selectHome,
+            score: homeScore,
+            mode: homeMode,
+        },
+        away: {
+            team: selectAway,
+            score: awayScore,
+            mode: awayMode,
+        },
+        timestamp: new Date().toLocaleString()
+    });
+
+    localStorage.setItem("previous_results", JSON.stringify(results));
+
+    results.forEach((n, index) => {
+        if (index <= 2) {
+            const li = document.createElement('li');
+            li.textContent = `${n.home.team} ${n.home.score}:${n.away.score} ${n.away.team}`;
+            previusResults.appendChild(li);
+        }
+    });
+}
+
+function downloadPreviousResults() {
+    const results = localStorage.getItem("previous_results");
+
+    if (results) {
+        const data = JSON.parse(results);
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'previous_results.json';
+        a.click();
+        URL.revokeObjectURL(url);
     }
+}
 
-    localStorage.setItem("results", JSON.stringify(results));
+// Função para gerar números aleatórios
+function random(max) {
+    let randomArray = new Uint32Array(1);
+    window.crypto.getRandomValues(randomArray);
+    return randomArray[0] % max + 1;
 }

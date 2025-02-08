@@ -7,14 +7,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SFA</title>
     <link rel="stylesheet" href="src/css/style.css">
+    <link rel="icon" href="src/img/sfa.png">
 </head>
 
 <body>
     <main>
+        <section class="menu" style="display: none;">
+            <div class="menu-button">
+                <img src="src/img/kick_off.png" alt="KICK OFF">
+                <p class="menu-button-name">KICK OFF</p>
+            </div>
+            <div class="menu-button">
+                <img src="src/img/penalty_shootout.png" alt="PENALTY SHOOTOUT">
+                <p class="menu-button-name">PENALTY SHOOTOUT</p>
+            </div>
+            <div class="menu-button">
+                <img src="src/img/previous_results.png" alt="PREVIOUS RESULTS">
+                <p class="menu-button-name">PREVIOUS RESULTS</p>
+            </div>
+        </section>
         <section class="setup">
             <div class="header">
                 <img class="logo" src="src/img/sfa.png" alt="SFA">
-                <p class="version">Version 1.1</p>
+                <p class="version">Version 1.2</p>
             </div>
             <div class="teams">
                 <div class="team">
@@ -83,7 +98,7 @@
                     <ul class="away-lineup"></ul>
                 </div>
             </div>
-            <div class="debug">
+            <div class="debug" onclick="downloadPreviousResults()">
                 <p class="home-debug"></p>
                 <ul class="previous-results"></ul>
                 <p class="away-debug"></p>
