@@ -26,14 +26,13 @@ main {
 }
 
 .menu {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Duas colunas de largura igual */
+    gap: 1rem; /* Espaçamento entre os botões */
     padding: 1rem;
 }
 
 .menu-button {
-    flex: 1;
     height: 6rem;
     background: rgba(255, 255, 255, 0.1);
     overflow-y: hidden;
@@ -48,7 +47,7 @@ main {
 }
 
 .menu-button img {
-    height: 100%;
+    height: 6rem;
     object-fit: cover;
     transition: ease-in-out 0.2s;
     mask-image: linear-gradient(315deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
@@ -61,10 +60,13 @@ main {
 }
 
 .menu-button-name {
-    text-align: right;
+    position: absolute;
+    right: 10px; 
+    bottom: 10px;
     font-weight: bold;
-    margin-right: 10px;
-    transform: translateY(-150%);
+    white-space: nowrap;
+    color: white;
+    z-index: 1;
 }
 
 .setup {
@@ -105,11 +107,6 @@ select {
 
 .logo {
     width: 32px;
-}
-
-.version {
-    font-size: 12px;
-    font-weight: bold;
 }
 
 .teams {
@@ -218,6 +215,11 @@ select {
 @media only screen and (min-width: 760px) {
     body {
         width: 760px;
+    }
+
+    .menu {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .summary,

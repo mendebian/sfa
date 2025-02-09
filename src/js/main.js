@@ -1,3 +1,12 @@
+function showSection(className) {
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        section.style.display = 'none';
+    });
+
+    document.querySelector(className).style.display = 'flex';
+}
+
 let homeLeague = [],
     awayLeague = [];
 
@@ -83,9 +92,7 @@ function simule() {
 
     const cap = homeLevel + awayLevel;
 
-    // Esconde o setup e exibe a partida
-    setup.style.display = 'none';
-    match.style.display = 'block';
+    showSection('.match');
 
     homeDisplay.textContent = selectHome;
     awayDisplay.textContent = selectAway;
@@ -298,6 +305,14 @@ function getPreviousResults() {
 
 // Armazena os resultados anteriores
 function storePreviousResults(selectHome, selectAway, homeScore, awayScore, homeMode, awayMode, results, previusResults) {
+    results.forEach((n, index) => {
+        if (index <= 2) {
+            const li = document.createElement('li');
+            li.textContent = `${n.home.team} ${n.home.score}:${n.away.score} ${n.away.team}`;
+            previusResults.appendChild(li);
+        }
+    });
+
     results.unshift({
         home: {
             team: selectHome,
@@ -313,14 +328,6 @@ function storePreviousResults(selectHome, selectAway, homeScore, awayScore, home
     });
 
     localStorage.setItem("previous_results", JSON.stringify(results));
-
-    results.forEach((n, index) => {
-        if (index <= 2) {
-            const li = document.createElement('li');
-            li.textContent = `${n.home.team} ${n.home.score}:${n.away.score} ${n.away.team}`;
-            previusResults.appendChild(li);
-        }
-    });
 }
 
 function downloadPreviousResults() {
